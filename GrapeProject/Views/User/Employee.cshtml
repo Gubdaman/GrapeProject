@@ -2,17 +2,63 @@
 @{
     ViewBag.Title = "Employee";
 }
+<script src="~/Scripts/Employee/main.js"></script>
 
-<h2>Employee</h2>
+<h2>Index</h2>
 
-<ul>
-    <li>Coffee</li>
-    <li>Tea</li>
-    <li>Milk</li>
-</ul>
+<div class="form-group">
+    <label for="exampleFormControlSelect1">Example select</label>
+    <select class="form-control" id="exampleFormControlSelect1">
 
-<input type="text"
-       id="myText"
-       value="text here" />
+    </select>
+</div>
 
-<button>Submit</button>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2">
+            <textarea id="idList" cols="40" rows="5"></textarea>
+        </div>
+        <div class="col-sm-8 align-middle">
+            <button onclick="testCall()">Login</button>
+            <button>Register</button>
+        </div>
+        <div class="col-sm-2">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+
+        </div>
+        <div class="col-sm-8 align-middle">
+            <input type="text"
+                   id="message"
+                   value="text here" />
+        </div>
+        <div class="col-sm-2">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+
+        </div>
+        <div class="col-sm-8 align-middle">
+            <textarea id="chat" cols="40" rows="5"></textarea>
+        </div>
+        <div class="col-sm-2">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+
+        </div>
+        <div class="col-sm-8 align-middle">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <div class="col-sm-2">
+
+        </div>
+    </div>
+</div>

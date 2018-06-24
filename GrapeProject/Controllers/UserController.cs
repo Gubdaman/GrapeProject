@@ -1,4 +1,5 @@
-﻿using GrapeProject.Models;
+﻿using GrapeProject.Hubs;
+using GrapeProject.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,5 +60,10 @@ namespace GrapeProject.Controllers
             return View("Login", user);
         }
 
+        [HttpGet]
+        public JsonResult GetUnansweredRooms()
+        {
+            return  Json(ChatHub.rooms.Where(t => !t.Value.Answered).Select(t => t.Key).ToList(), JsonRequestBehavior.AllowGet);
+        }
     }
 }
