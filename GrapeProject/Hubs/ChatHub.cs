@@ -110,12 +110,12 @@ namespace GrapeProject.Hubs
                 });
             }
             
-            Clients.Group(msg.RoomName).ProcessMessage(msg.UserId + ": " + msg.Text);
+            Clients.Group(msg.RoomName).ProcessMessage(msg);
         }
 
         public void Send(Message msg)
         {
-            Clients.Group(Context.ConnectionId).ProcessMessage(msg.UserId + ": " + msg.Text);
+            Clients.Group(Context.ConnectionId).ProcessMessage(msg);
         }
     }
 }

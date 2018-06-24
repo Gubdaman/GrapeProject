@@ -1,16 +1,9 @@
 ﻿//USER
 
-(function initCtrl() {
 
-    this.connection = null;
-    this.proxy = null;
-
-    
-
-})();
 
 var publish = function (message) {
-    $("#chat")[0].value = $("#chat")[0].value + message + "\n";
+    $("#chat")[0].value = $("#chat")[0].value + message.UserId + ": " + message.Text + "\n";
 }
 
 var connectToHub = function (UserName) {
@@ -74,3 +67,11 @@ window.onbeforeunload = function () {
     this.proxy.invoke('leave').done(function () { });
 };
 
+(function initCtrl() {
+
+    this.connection = null;
+    this.proxy = null;
+
+    connectToHub("Anon")
+
+})();

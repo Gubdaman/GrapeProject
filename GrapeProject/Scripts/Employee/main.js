@@ -1,19 +1,36 @@
 ﻿//EMPLOYEE
 
-(function initCtrl() {
 
-    this.connection = null;
-    this.proxy = null;
-    this.connectedRooms = [];
-    this.availableRooms = [];
-
-    
-
-})();
 
 var publish = function (message) {
-    $("#chat")[0].value = $("#chat")[0].value + message + "\n";
+    if (!this.ongoingChats.hasOwnProperty(message.RoomName)) {
+        this.ongoingChats[message.RoomName] = "";
+    }
+    this.ongoingChats[message.RoomName] = this.ongoingChats[message.RoomName] + message.UserId + ": " + message.Text + "\n";
+    updateChat();
 }
+
+var changeRoom = function () {
+    this.currentChat = $("#roomSelect")[0].options[$("#roomSelect")[0].selectedIndex].text;
+    updateChat();
+}
+
+var updateList = function () {
+    $("#roomSelect")[0].options.length = 0;
+    for (index in this.availableRooms) {
+        $("#roomSelect")[0].options[$("#roomSelect")[0].options.length] = new Option(this.availableRooms[index], index);
+    }
+    
+    for (index in this.connectedRooms) {
+        $("#roomSelect")[0].options[$("#roomSelect")[0].options.length] = new Option(this.connectedRooms[index], index);
+    }
+    if (this.currentChat === "") { this.currentChat = $("#roomSelect")[0].options[0].text }
+}
+
+var updateChat = function () {
+    $("#chat")[0].value = this.ongoingChats[this.currentChat];
+}
+
 var manageRoomList = function (data) {
     if (data.isAdd) {
         this.availableRooms.push(data.Name);
@@ -22,32 +39,24 @@ var manageRoomList = function (data) {
         var index = this.availableRooms.indexOf(data.Name);
         if (index !== -1) this.availableRooms.splice(index, 1);
     }
-    $("#idList")[0].value = [];
-    this.availableRooms.forEach(function (element) {
-        $("#idList")[0].value = $("#idList")[0].value + element + "\n";
-    });
+    updateList();
 }
 
 var getAvailableRooms = function () {
+    var that = this;
     $.get(
         "/user/GetUnansweredRooms",
         function (data) {
-            this.availableRooms = data;
-            $("#idList")[0].value = [];
-            this.availableRooms.forEach(function (element) {
-                    $("#idList")[0].value = $("#idList")[0].value + element + "\n";
-            });
+            that.availableRooms = data;
+            updateList();
         }
     )
 }
 
-var connectToHub = function (UserName) {
+
+this.connectToHub = function (UserName) {
 
     if (this.connection === null) {
-        //var url = RequestSvc.getHost();
-
-        //$.connection.hub.url = url + "/signalr";
-        //connection = $.hubConnection(url);
         this.connection = $.hubConnection();
         this.proxy = connection.createHubProxy("chatHub");
 
@@ -60,16 +69,7 @@ var connectToHub = function (UserName) {
 
         connection.qs = { "userId": UserName };
         connection.start().done(function () {
-            proxy.invoke('joinRoom', "ba36ef78-156f-4bb2-8974-23b5a24e0d72").done(function () {
-                proxy.invoke('joinRoomInfo').done(function () {
-                    proxy.invoke('sendToRoom', {
-                        userId: UserName, text: "Connected!", roomName: "ba36ef78-156f-4bb2-8974-23b5a24e0d72"
-                    }).done(function () {
-                        console.log('Success!');
-                    }).fail(function (error) {
-                        console.log('Error: ' + error);
-                    });
-                });
+            proxy.invoke('joinRoomInfo').done(function () {
                 
             });
         });
@@ -81,8 +81,7 @@ var connectToHub = function (UserName) {
 
 var testCall = function () {
 
-    connectToHub("TestUser");
-    getAvailableRooms();
+    
     /*
     $.get(
         "/user",
@@ -95,7 +94,18 @@ var testCall = function () {
 
 var sendMessage = function () {
 
-    this.proxy.invoke('sendToRoom', { userId: "TestUser", text: $("#message")[0].value, roomName: "ba36ef78-156f-4bb2-8974-23b5a24e0d72" });
+    var index = this.availableRooms.indexOf(this.currentChat);
+    var that = this;
+    if (index === -1) {
+        this.proxy.invoke('joinRoom', this.currentChat).done(function () {
+            that.proxy.invoke('sendToRoom', { UserId: "TestUser", Text: $("#message")[0].value, RoomName: that.currentChat });
+        });
+        this.connectedRooms.push(this.currentChat);
+    }
+    else {
+        this.proxy.invoke('sendToRoom', { UserId: "TestUser", Text: $("#message")[0].value, RoomName: that.currentChat });
+    }
+    
 
 }
 
@@ -106,3 +116,18 @@ window.onbeforeunload = function () {
     this.proxy.invoke('leaveRoomInfo');
 };
 
+(function initCtrl() {
+
+    this.connection = null;
+    this.proxy = null;
+    this.connectedRooms = [];
+    this.availableRooms = [];
+
+    this.ongoingChats = {};
+    this.currentChat = "";
+
+    getAvailableRooms();
+    connectToHub("TestUser");
+
+
+})();

@@ -63,7 +63,7 @@ namespace GrapeProject.Controllers
         [HttpGet]
         public JsonResult GetUnansweredRooms()
         {
-            return  Json(ChatHub.rooms.Where(t => !t.Value.Answered).Select(t => t.Key).ToList(), JsonRequestBehavior.AllowGet);
+            return  Json(ChatHub.rooms.Where(t => !t.Value.Answered && t.Key != "RoomInfo").Select(t => t.Key).ToList(), JsonRequestBehavior.AllowGet);
         }
     }
 }
